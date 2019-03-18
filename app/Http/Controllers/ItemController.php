@@ -14,6 +14,7 @@ use Response;
 use Illuminate\Support\Facades\DB;
 use Youtube;
 use App\Models\Item;
+use App\Models\Course;
 
 class ItemController extends AppBaseController
 {
@@ -47,8 +48,9 @@ class ItemController extends AppBaseController
      */
     public function create($course_id)
     {
-        
-        return view('items.create')->with('course_id', $course_id);
+        $course = Course::find($course_id);
+
+        return view('items.create')->with('course_id', $course_id)->with('course', $course);
     }
 
     public function importYoutube(Request $request)
@@ -91,14 +93,38 @@ class ItemController extends AppBaseController
         $checkItem = Item::where('course_id', $input['course_id'])
         ->where('url', $itemUrl)->first();
 
+        if(isset($playlistItem->snippet->thumbnails->default->url)){
+            $thumbnail = $playlistItem->snippet->thumbnails->default->url;
+        }else{
+            $thumbnail = '';
+        }
+
+       $course = Course::find($item->thumbnail);
+        if($course->actual_price == 0){ //meaning this course is free
+                $is_free = 1;
+        }else{
+                $is_free = 0;
+        }
+
         if(!$checkItem){
             Item::create([
                     'course_id'=> $input['course_id'],
                     'url' => $itemUrl,
+                    'is_free' => $is_free,
+                    'thumbnail' => $thumbnail,
                     'description' => $playlistItem->snippet->description,
                     'title' => $playlistItem->snippet->title,
                     'user_id' => Auth::user()->id
                     ]);
+        }else{
+                Item::where('id', $checkItem->id )->update([
+                    'course_id' => $input['course_id'],
+                    'url' => $itemUrl,
+                    'thumbnail' => $thumbnail,
+                    'description' => $playlistItem->snippet->description,
+                    'title' => $playlistItem->snippet->title,
+                    'user_id' => Auth::user()->id
+                ]);
         }
       
    }
@@ -121,11 +147,20 @@ class ItemController extends AppBaseController
         $input = $request->all();
         $input['user_id'] = Auth::user()->id;
 
+        $course = Course::find($input['course_id']);
+        if ($course->actual_price == 0) { //meaning this course is free
+            $is_free = 1;
+        } else {
+            $is_free = 0;
+        }
+             $input['is_free'] = $is_free;
+
         $item = $this->itemRepository->create($input);
 
         Flash::success('Item created successfully.');
 
         return redirect(route('courses.contents',['course_id'=> $input['course_id'],'contents' => 'yes' ]));
+           
     }
 
     /**
@@ -164,8 +199,12 @@ class ItemController extends AppBaseController
 
             return redirect(route('courses.index'));
         }
+        $course = Course::find($item->course_id);
 
-        return view('items.edit')->with('item', $item)->with('course_id', $item->course_id);
+        return view('items.edit')
+        ->with('item', $item)
+        ->with('course', $course)
+        ->with('course_id', $item->course_id);
     }
 
     /**
@@ -191,6 +230,7 @@ class ItemController extends AppBaseController
         Flash::success('Item updated successfully.');
 
         return redirect(route('courses.items',['course_id'=> $item->course_id, 'item_id'=> $item->id]));
+         
     }
 
     /**

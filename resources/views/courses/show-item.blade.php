@@ -23,33 +23,43 @@
 
        ?>
 
-@if($ret > 0)
-        <iframe 
-        width="100%" 
-        height="450px" 
-        src="https://www.youtube.com/embed/<?php echo  $matches[0]; ?>" 
-        frameborder="0" 
-        allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
-         allowfullscreen></iframe>
+   @if(!isset($getSubscription->created_at) AND ( Auth::user()->id != $item->user_id || Auth::user()->role_id > 2))
+           <h3 class="col-md-12 text-center"> Pay to access this course </h3>        
+         @include('courses.payment-options')
+   @else
 
-@else
+        @if($ret > 0)
+                <iframe 
+                width="100%" 
+                height="450px" 
+                src="https://www.youtube.com/embed/<?php echo  $matches[0]; ?>" 
+                frameborder="0" 
+                allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
+                allowfullscreen></iframe>
 
-<a href="{{ $item->url }}" target="_blank"> {{ $item->url  }} </a>
+        @else
 
-@endif
+                <a href="{{ $item->url }}" target="_blank"> {{ $item->url  }} </a>
+
+        @endif
+
+   @endif
+
+
+
+
 
 <?php } ?> 
 
-
+   @if(isset($getSubscription->created_at) || Auth::user()->id == $item->user_id || Auth::user()->role_id < 3)
+                   
          <div class="mt-5 mb-5">
              <h3>Description 
-                
-
              </h3>
              <div class="text-muted"> {{ $item->created_at->format('h:i a- D d M Y')}} </div>
                 {{ $item->description }}
          </div>
-
+ @endif
            <h2 class="col-md-12">Comments and Reviews</h2>
                         @include('comments.table')
     </div>

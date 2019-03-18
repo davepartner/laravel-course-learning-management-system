@@ -79,8 +79,19 @@ class CourseController extends AppBaseController
         //Pass it to the course/contents view
         $contents = 'yes';
 
+        if (Auth::check()) {
+            $getSubscription = CourseUser::where('course_id', $course_id)
+                ->where('user_id', Auth::user()->id)->first();
+        }
+
+
+        if (!isset($getSubscription) || !$getSubscription) {
+            $getSubscription = 'no';
+        }
+
         return view('courses.show')
             ->with('course', $course)
+            ->with('getSubscription', $getSubscription)
             ->with('contents', $contents);
     }
 

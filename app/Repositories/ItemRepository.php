@@ -25,7 +25,9 @@ class ItemRepository extends BaseRepository
         'view_count',
         'url',
         'title',
-        'description'
+        'description',
+        'is_free',
+        'thumbnail',
     ];
 
     /**

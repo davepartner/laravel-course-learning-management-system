@@ -7,13 +7,13 @@
                         <i class="glyphicon glyphicon-plus"> </i>
                         Add Item </a>
            
-                    <button class="btn btn-lg btn-danger ml-3" data-toggle="modal" data-target="#importYoutubeModal"> 
-                        <i class="glyphicon glyphicon-plus"> </i>
-                        Import from youtube </button>
+        <button class="btn btn-lg btn-danger ml-3" data-toggle="modal" data-target="#importYoutubeModal"> 
+            <i class="glyphicon glyphicon-plus"> </i>
+            Import from youtube </button>
 
  
 
-<!-- Modal -->
+<!-- Youtube Modal -->
 <div class="modal fade" id="importYoutubeModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
@@ -36,12 +36,6 @@
             {!! Form::label('youtube_playlist_url', 'Youtube Playlist Url:') !!}
             {!! Form::text('youtube_playlist_url', null, ['class' => 'form-control', 'placeholder'=> 'eg. https://youtube.com...']) !!}
         </div>
-
-       
-
-
-
-
       </div>
       <div class="modal-footer">
         {!! Form::submit('Submit', ['class' => 'btn btn-primary']) !!}
@@ -57,6 +51,36 @@
 
 
 
+
+
+<!-- Payment Modal -->
+<div class="modal fade" id="paymentOptions" tabindex="-1" role="dialog" aria-labelledby="paymentOptionsLabel">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+       
+       
+        <h4 class="modal-title text-left" id="paymentOptionsLabel">Complete payment to access this course</h4>
+
+ <button type="button" class="close text-right" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span></button>
+      </div>
+      
+
+ <div class="modal-body">
+        
+    @include('courses.payment-options')
+    
+      </div>
+      <div class="modal-footer">
+
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+      </div>
+
+
+    </div>
+  </div>
+</div>
 
 
 
@@ -87,15 +111,25 @@
             {{-- {!! $item->url !!} --}}
             <td data-toggle="modal" data-target="#modal-default">
                 
-               <h3 data-toggle="modal" data-target="#modal-default"> 
-                   
-                <a href="{{ route('courses.items', ['course_id'=> $course->id, 'item_id'=>$item->id ] ) }}"> {{ $item->title }} </a> 
-            
-            </h3>
-            <div class="text-muted">{!! $item->view_count !!} views </div>
-                
-            {!! mb_strimwidth($item->description, 0, 150, '...') !!}
-          
+                  @if(isset($item->thumbnail))
+                    <img class="col-md-3" src="{{ $item->thumbnail }}"  style="margin-top: 30px; padding-right: 0px; padding-left: 0px;">
+                  @endif
+                <div class="col-md-9" style="padding-left: 5px;padding-right: 5px;">
+                        <h3 data-toggle="modal" data-target="#modal-default" > 
+                              @if(!isset($getSubscription->created_at) AND (Auth::user()->id != $course->user_id || Auth::user()->role_id > 2 || $item->is_free != 1) )
+                                    <a href="#" style="color:brown" data-toggle="modal" data-target="#paymentOptions"> 
+                            {{ $item->title }} </a> 
+
+                            @else
+                            <a href="{{ route('courses.items', ['course_id'=> $course->id, 'item_id'=>$item->id ] ) }}"> 
+                            {{ $item->title }} </a> 
+                              @endif
+
+                        </h3>
+                        <div class="text-muted">{!! $item->view_count !!} views </div>
+
+                        {!! mb_strimwidth($item->description, 0, 150, '...') !!}
+                  </div>
             </td>
             <td>
                 @if(Auth::check() AND (Auth::user()->role_id < 3 || Auth::user()->id == $course->id ))

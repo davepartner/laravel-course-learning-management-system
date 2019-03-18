@@ -35,6 +35,8 @@ class Item extends Model
         'view_count',
         'url',
         'title',
+        'is_free',
+        'thumbnail',
         'description'
     ];
 
@@ -48,6 +50,8 @@ class Item extends Model
         'user_id' => 'integer',
         'course_id' => 'integer',
         'view_count' => 'integer',
+        'is_free' => 'tinyint',
+        'thumbnail' => 'string',
         'url' => 'string',
         'title' => 'string',
         'description' => 'string'
