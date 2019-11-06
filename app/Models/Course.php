@@ -59,10 +59,13 @@ class Course extends Model
         'what_will_students_learn',
         'target_students',
         'requirements',
+        'faq',
         'discount_price',
         'actual_price',
         'view_count',
-        'subscriber_count'
+        'subscriber_count',
+        'main_course_id',
+        'summary_course_id',
     ];
 
     /**
@@ -87,10 +90,13 @@ class Course extends Model
         'what_will_students_learn' => 'string',
         'target_students' => 'string',
         'requirements' => 'string',
+        'faq' => 'string',
         'discount_price' => 'float',
         'actual_price' => 'float',
         'view_count' => 'integer',
-        'subscriber_count' => 'integer'
+        'subscriber_count' => 'integer',
+        'main_course_id' => 'integer',
+        'summary_course_id' => 'integer',
     ];
 
     /**
@@ -139,5 +145,9 @@ class Course extends Model
     public function items()
     {
         return $this->hasMany('App\Models\Item');
+    }
+    public function payments()
+    {
+        return $this->hasMany('App\Models\Payment');
     }
 }

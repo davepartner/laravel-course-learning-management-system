@@ -19,7 +19,7 @@
 <div class="col-md-12" >
 <div class="form-group col-md-6">
     {!! Form::label('title', 'Title:') !!}
-    {!! Form::text('title', null, ['class' => 'form-control']) !!}
+    {!! Form::text('title', null, ['class' => 'form-control','required']) !!}
 </div>
 </div>
 
@@ -51,10 +51,10 @@
 
 
 <!-- Description Field -->
-<div class="form-group col-md-8">
-    {!! Form::label('description', 'Description:') !!}
+<div class="form-group col-md-12 ">
+  {!! Form::label('description', 'Description:') !!}
     {!! Form::textarea('description', null, ['class' => 'form-control']) !!}
-</div>
+</div>  
 
 <!-- Submit Field -->
 <div class="form-group col-md-12">

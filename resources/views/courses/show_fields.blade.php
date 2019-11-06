@@ -1,109 +1,34 @@
+   <?php if(!empty($course->promo_video_url)){ ?>
 
+       <?php 
+            $matches = array();
+            $url =   $course->promo_video_url ;
+            $ret = preg_match("#(?<=v=)[a-zA-Z0-9-]+(?=&)|(?<=v\/)[^&\n]+(?=\?)|(?<=v=)[^&\n]+|(?<=youtu.be/)[^&\n]+#", $url, $matches);
 
-<div class="form-group col-md-12">
-     <p>{!! $course->sub_title !!}
-         <div class="text-muted col-md-6">
-             
-            @if($course->subscriber_count > 0)
-            | Students : {{ number_format($course->subscriber_count) }}
-            @endif
-            @if($course->view_count > 0)
-            | Views : {{ number_format($course->view_count) }}
-            @endif
-            
+       ?>
 
-            <!-- Created At Field -->
-<div class="form-group col-md-6">
-    {!! Form::label('created_at', 'Created At:') !!}
-    <p>{!! $course->created_at->format('h:i a - D d M Y') !!}</p>
-</div>
-<!-- Updated At Field -->
-<div class="form-group col-md-6">
-    {!! Form::label('updated_at', 'Last Updated:') !!}
-    <p>{!! $course->updated_at->format('h:i a - D d M Y') !!}</p>
-</div>
+ @if($ret > 0)
+ 
+ <div class="row">
+	 <br/>
+	 <h3 class="text-danger col-md-9" style="padding-left: 15px;"> 
+            <i class="glyphicon glyphicon-warning-sign"></i> 
+       [Watch till end] Do not skip this video! </h3>
+        
+                <iframe 
+				height="450px" 
+                class="col-md-9" 
+                src="https://www.youtube.com/embed/<?php echo  $matches[0]; ?>?&autoplay=1&controls=0&showinfo=0&loop=1" 
+                frameborder="0" 
+                allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
+                allowfullscreen></iframe>
+ </div>
+        @else
 
-<!-- User Id Field -->
-<div class="form-group col-md-6">
-    {!! Form::label('user_id', 'Author:') !!}
-    <p><a href="/users/{{$course->user['id']}}"> {!! $course->user['name'] !!}</a></p>
-</div>
+                {{-- Watch <a href="{{ $course->promo_video_url }}" target="_blank"> Promo Video</a> --}}
 
-<!-- Category Id Field -->
-<div class="form-group col-md-6">
-    {!! Form::label('category_id', 'Category :') !!}
-    <p><a href="/categories/{!! $course->category['id'] !!}">{{ $course->category['name'] }} </a></p>
-</div>
-         </div>
-
-         @if(!isset($getSubscription->created_at) )
-                   
-         @include('courses.payment-options')
-
-          @endif
-
-                        
-                        </div>
-
-     </p>
-</div>
-
-
-
-@if(Auth::check() AND (Auth::user()->role_id < 3 || Auth::user()->id == $course->user_id))
-        <!-- Creator Status Field -->
-        <div class="form-group col-md-6">
-            {!! Form::label('creator_status', 'Creator Status:') !!}
-            <p>
-              @if($course->creator_status == 1)
-                                Published 
-                                       
-                                         {!! Form::open(['route' => ['courses.unpublishCourse', $course->id], 'method' => 'post']) !!}
-                                               <input type="hidden" name="course_id" value="{{ $course->id }}" />
-                                                    {!! Form::button('<i class="glyphicon glyphicon-trash"></i> Click to Unpublish', ['type' => 'submit', 'class' => 'btn btn-danger btn-xs', 'onclick' => "return confirm('Are you sure you want to unpublish?')"]) !!}
-                                         {!! Form::close() !!}
-                                
-                            @else
-                                Unpublished 
-                                            
-                                       {!! Form::open(['route' => ['courses.publishCourse', $course->id], 'method' => 'post']) !!}
-                                            <input type="hidden" name="course_id" value="{{ $course->id }}" />
-                                            {!! Form::button('<i class="glyphicon glyphicon-thumbs-up"></i> Click to Publish', ['type' => 'submit', 'class' => 'btn btn-success btn-xs', 'onclick' => "return confirm('Are you sure you want to publish?')"]) !!}
-                                         {!! Form::close() !!}
-                                   
-                            @endif 
-</p>
-        </div>
-                <!-- Admin Status Field -->
-                <div class="form-group col-md-6">
-                    {!! Form::label('admin_status', 'Admin Status:') !!}
-
-                    <p>
-                        
-                         @if($course->admin_status == 1)
-                                Approved 
-                                @if(Auth::user()->role_id < 3)
-                                        | 
-                                         {!! Form::open(['route' => ['courses.disapprove', $course->id], 'method' => 'post']) !!}
-                                               <input type="hidden" name="course_id" value="{{ $course->id }}" />
-                                                    {!! Form::button('<i class="glyphicon glyphicon-trash"></i> Click to disapprove', ['type' => 'submit', 'class' => 'btn btn-danger btn-xs', 'onclick' => "return confirm('Are you sure disapprove?')"]) !!}
-                                         {!! Form::close() !!}
-                                @endif
-                            @else
-                                Disapproved 
-                                    @if(Auth::user()->role_id < 3)
-                                                | 
-                                       {!! Form::open(['route' => ['courses.approve', $course->id], 'method' => 'post']) !!}
-                                            <input type="hidden" name="course_id" value="{{ $course->id }}" />
-                                            {!! Form::button('<i class="glyphicon glyphicon-thumbs-up"></i> Click to approve', ['type' => 'submit', 'class' => 'btn btn-success btn-xs', 'onclick' => "return confirm('Are you sure you want to approve?')"]) !!}
-                                         {!! Form::close() !!}
-                                    @endif 
-                            @endif 
-
-                   </p>
-                </div>
-
-@endif
+        @endif
+<?php } ?>
 
 
 
@@ -113,22 +38,26 @@
 
 <!-- Description Field -->
 <div class="form-group col-md-8">
-    {!! Form::label('description', 'Description:') !!}
+   <h3>
+       <i class="glyphicon glyphicon-align-justify"></i> {!! Form::label('description', 'Description:') !!}
+   </h3>
     <p>{!! $course->description !!}</p>
 </div>
 
+{{-- @include('courses.payment-options') --}}
+
 <!-- About Instructor Field -->
-<div class="form-group col-md-8">
-    {!! Form::label('about_instructor', 'About Instructor:') !!}
+<div class="form-group col-md-12">
+   <h3> <i class="glyphicon glyphicon-user"></i> {!! Form::label('about_instructor', 'About Instructor:') !!}</h3>
     <p>{!! $course->about_instructor !!}</p>
 </div>
 
 
 <!-- Tags Field -->
-<div class="form-group col-md-8">
-    {!! Form::label('tags', 'Tags:') !!}
+{{-- <div class="form-group col-md-12">
+    <i class="glyphicon glyphicon-resize-small"></i> {!! Form::label('tags', 'Tags:') !!}
     <p>{!! $course->tags !!}</p>
-</div>
+</div> --}}
 
 <!-- Promo Video Url Field -->
 {{-- <div class="form-group">
@@ -146,24 +75,34 @@
 
 
 <!-- What Will Students Learn Field -->
-<div class="form-group col-md-8">
-    {!! Form::label('what_will_students_learn', 'What Will Students Learn:') !!}
+<div class="form-group col-md-12">
+   <h3><i class="glyphicon glyphicon-education"></i> 
+    {!! Form::label('what_will_students_learn', 'What Will Students Learn:') !!}</h3>
     <p>{!! $course->what_will_students_learn !!}</p>
 </div>
 
 <!-- Target Students Field -->
-<div class="form-group col-md-8">
-    {!! Form::label('target_students', 'Target Students:') !!}
+<div class="form-group col-md-12">
+   <h3><i class="glyphicon glyphicon-user"></i><i class="glyphicon glyphicon-user"></i> 
+    {!! Form::label('target_students', 'Target Students:') !!} </h3>
     <p>{!! $course->target_students !!}</p>
 </div>
 
 <!-- Requirements Field -->
-<div class="form-group col-md-8">
-    {!! Form::label('requirements', 'Requirements:') !!}
+<div class="form-group col-md-12">
+    <h3><i class="glyphicon glyphicon-pushpin"></i> {!! Form::label('requirements', 'Requirements:') !!} </h3>
     <p>{!! $course->requirements !!}</p>
 </div>
 
+<!-- Faq Field -->
+<div class="form-group col-md-12">
+   <h3> <i class="glyphicon glyphicon-question-sign"></i> {!! Form::label('faq', 'Frequently asked questions:') !!}</h3>
+    <p>{!! $course->faq !!}</p>
+</div>
 
 
+<div class="form-group col-md-12">
+ @include('courses.payment-options')
+</div>
 
-
+   

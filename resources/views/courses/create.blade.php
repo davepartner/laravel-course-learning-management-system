@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('layouts.app',['title'=>'Create a course'])
 
 @section('content')
     <section class="content-header">
@@ -11,7 +11,7 @@
         <div class="box box-primary">
 
             <div class="box-body">
-                <div class="row">
+                <div class="col-md-8">
                     {!! Form::open(['route' => 'courses.store']) !!}
 
                         @include('courses.fields')

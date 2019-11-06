@@ -15,6 +15,7 @@ use Response;
 use App\Models\Category;
 use App\Models\Course;
 use App\Models\Item;
+use App\Models\View;
 use App\Models\CourseUser;
 
 class CourseController extends AppBaseController
@@ -42,16 +43,48 @@ class CourseController extends AppBaseController
 
         $item = Item::where('id', $item_id)->first();
 
+        //log view
         DB::table('items')->where('id', $item_id)->increment('view_count');
+        $getView = View::where('user_id', Auth::user()->id)->where('item_id', $item->id)->first();
 
+        if(!$getView){
+            View::create([
+                'user_id' => Auth::user()->id,
+                'item_id' => $item->id,
+            ]);
+        }
         //Pass it to the course/contents view
         $items = 'yes';
+
+
+        if (Auth::check()) {
+            $getSubscription = CourseUser::where('course_id', $course_id)
+                ->where('user_id', Auth::user()->id)->first();
+        }
+
+
+        if (!isset($getSubscription) || !$getSubscription) {
+            $getSubscription = 'no';
+        }
+
+        $nextItem = Item::where('id', '>', $item->id)->where('course_id', $item->course_id)->min('id');
+        $prevItem = Item::where('id', '<', $item->id)->where('course_id', $item->course_id)->min('id');
+      
 
         return view('courses.show')
             ->with('course', $course)
             ->with('items', $items)
+            ->with('nextItem', $nextItem)
+            ->with('prevItem', $prevItem)
+            ->with('getSubscription', $getSubscription)
             ->with('item', $item);
     }
+
+
+
+
+
+
 
     public function subscribers($course_id){
         //Get the list of items that belong to this course
@@ -65,8 +98,21 @@ class CourseController extends AppBaseController
         //Pass it to the course/contents view
         $subscribers = 'yes';
 
+
+
+        if (Auth::check()) {
+            $getSubscription = CourseUser::where('course_id', $course_id)
+                ->where('user_id', Auth::user()->id)->first();
+        }
+
+
+        if (!isset($getSubscription) || !$getSubscription) {
+            $getSubscription = 'no';
+        }
+        
         return view('courses.show')
         ->with('course', $course)
+        ->with('getSubscription', $getSubscription)
         ->with('subscribers', $subscribers)
         ;
     }
@@ -104,9 +150,19 @@ class CourseController extends AppBaseController
         $course = Course::withCount(['comments', 'items', 'users'])->where('id', $course_id)->first();
         //Pass it to the course/contents view
         $comments = 'yes';
+          if (Auth::check()) {
+            $getSubscription = CourseUser::where('course_id', $course_id)
+                ->where('user_id', Auth::user()->id)->first();
+        }
+
+
+        if (!isset($getSubscription) || !$getSubscription) {
+            $getSubscription = 'no';
+        }
 
         return view('courses.show')
             ->with('course', $course)
+            ->with('getSubscription', $getSubscription)
             ->with('comments', $comments);
     }
 
@@ -180,8 +236,15 @@ class CourseController extends AppBaseController
     public function create()
     {
         $categories = Category::all();
-        
-        return view('courses.create')->with('categories', $categories);
+        $mainCourses = Course::where('user_id',Auth::user()->id)
+        ->where( 'admin_status', 1)
+        ->where( 'creator_status', 1)
+        ->get();
+
+        return view('courses.create')
+        ->with('categories', $categories)
+        ->with( 'mainCourses', $mainCourses)
+        ;
     }
 
     /**
@@ -196,6 +259,11 @@ class CourseController extends AppBaseController
         $input = $request->all();
         $input['user_id'] = Auth::user()->id;
         $course = $this->courseRepository->create($input);
+        if($request->input('main_course_id') ){
+            Course::where('id', $course->main_course_id)->update([
+                'summary_course_id' => $course->id
+            ]);
+        }
 
         Flash::success('Course saved successfully.');
 
@@ -214,15 +282,41 @@ class CourseController extends AppBaseController
 
         $course = Course::withCount(['comments', 'items', 'users'])->where('id', $id)->first();
 
+        //get all the summary courses, if this is the main course
+
+        if($course->main_course_id){ //this is a summary course
+            //find the main course
+             $mainCourse = Course::where('id', $course->main_course_id)->first();
+
+        }
+
+        //get the summary courses if this is a main course
+        if(empty($course->main_course_id)){ 
+            //get all the courses that has this course as their main course
+            $summaryC = Course::where( 'main_course_id', $course->id)->get();
+           
+            //set the $summaryCourses var only if there are summary courses
+            if( $summaryC){
+                $summaryCourses = $summaryC;
+            }
+        }
+
+
         if (empty($course)) {
             Flash::error('Course not found');
 
             return redirect(route('courses.index'));
         }
 
+          //log view
+        DB::table('courses')->where('id', $id)->increment('view_count');
         if(Auth::check()){
             $getSubscription = CourseUser::where('course_id', $id)
                 ->where('user_id', Auth::user()->id)->first();
+                if($getSubscription){
+                    Flash::success('You now have full access to this course, scroll down to start viewing the contents');
+                    return redirect()->route('courses.contents',['course_id' => $id]);
+                }
         }
        
 
@@ -230,11 +324,38 @@ class CourseController extends AppBaseController
             $getSubscription = 'no';
         }
 
+
+        if(isset($mainCourse)){
+            return view('courses.show')
+                    ->with('course', $course)
+                    ->with('mainCourse', $mainCourse)
+                    ->with('description', 'yes')
+                    ->with('getSubscription', $getSubscription)
+                    ;
+        }
+
+        if (isset($summaryCourses)) {
+            return view('courses.show')
+                ->with('course', $course)
+                ->with('summaryCourses', $summaryCourses)
+                ->with('description', 'yes')
+                ->with('getSubscription', $getSubscription);
+        }
+
+        if (isset($summaryCourses) AND isset($summaryCourses)) {
+            return view('courses.show')
+                ->with('course', $course)
+                ->with('summaryCourses', $summaryCourses)
+                ->with('description', 'yes')
+                ->with('getSubscription', $getSubscription);
+        }
+
         return view('courses.show')
-        ->with('course', $course)
-        ->with('description', 'yes')
-        ->with('getSubscription', $getSubscription)
-        ;
+            ->with('course', $course)
+            ->with('description', 'yes')
+            ->with('getSubscription', $getSubscription);
+       
+       
     }
 
     /**
@@ -247,14 +368,29 @@ class CourseController extends AppBaseController
     public function edit($id)
     {
         $course = $this->courseRepository->findWithoutFail($id);
-
+        $mainCourses = Course::where('user_id', Auth::user()->id)
+            ->where('admin_status', 1)
+            ->where('creator_status', 1)
+            ->get();
+            if(isset( $course->main_course_id)){
+                 $mainCourse = Course::where('id', $course->main_course_id)->first();
+            }
         if (empty($course)) {
             Flash::error('Course not found');
 
             return redirect(route('courses.index'));
         }
 
-        return view('courses.edit')->with('course', $course);
+        if(empty( $mainCourse)){
+            $mainCourse = 'none';
+        }
+
+        $categories = Category::all();
+        return view('courses.edit') 
+        ->with('course', $course)
+        ->with( 'mainCourses', $mainCourses)
+        ->with( 'mainCourse', $mainCourse)
+        ->with('categories', $categories);
     }
 
     /**

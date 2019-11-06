@@ -13,8 +13,11 @@ use Prettus\Repository\Criteria\RequestCriteria;
 use Response;
 use Illuminate\Support\Facades\DB;
 use Youtube;
+use Mail;
 use App\Models\Item;
+use App\Models\View;
 use App\Models\Course;
+use App\Mail\CourseUpdated;
 
 class ItemController extends AppBaseController
 {
@@ -99,13 +102,14 @@ class ItemController extends AppBaseController
             $thumbnail = '';
         }
 
-       $course = Course::find($item->thumbnail);
+       $course = Course::find($input['course_id']);
         if($course->actual_price == 0){ //meaning this course is free
                 $is_free = 1;
         }else{
                 $is_free = 0;
         }
 
+        $wasItemAdded = 'no';
         if(!$checkItem){
             Item::create([
                     'course_id'=> $input['course_id'],
@@ -116,6 +120,7 @@ class ItemController extends AppBaseController
                     'title' => $playlistItem->snippet->title,
                     'user_id' => Auth::user()->id
                     ]);
+                    $wasItemAdded = 'yes';
         }else{
                 Item::where('id', $checkItem->id )->update([
                     'course_id' => $input['course_id'],
@@ -129,8 +134,43 @@ class ItemController extends AppBaseController
       
    }
 
+        //send email to all users if $wasItemAdded 
+        if($wasItemAdded == 'yes'){
+            //find all subscribers of this course
+            $getCourseUsers = Course::where('id', $input['course_id'])->get();
+            $courseUserEmail = array();
+            
+
+            if($getCourseUsers){
+                $course = Course::find( $input['course_id']);
+
+                foreach($getCourseUsers as $courseUser){
+                    //extract first name from email
+                   /*
+                    $emailParts = explode("@", $courseUser->user['email']);
+                    $username = $emailParts[0];
+                    */
+
+                    //add all emails in an array
+                    array_push($courseUserEmail, $courseUser->user['email']);
+                }
+
+                //send email to all students including admin
+                Mail::to('realdavepartner@gmail.com')
+                ->bcc($courseUserEmail)
+                 ->send(new CourseUpdated($course));  
+            }
+         
+        }
+        
+
+
         Flash::success('Item imported successfully. Scroll down to view imported items');
 
+        //update course playlist url
+        Course::where('id', $course->id)->update([
+            'playlist_url' => $input['youtube_playlist_url']
+        ]);
         return redirect()->back();
 
     }
@@ -142,11 +182,12 @@ class ItemController extends AppBaseController
      *
      * @return Response
      */
-    public function store(CreateItemRequest $request)
+    public function store(Request $request)
     {
         $input = $request->all();
         $input['user_id'] = Auth::user()->id;
-
+        dd($request->all());
+       
         $course = Course::find($input['course_id']);
         if ($course->actual_price == 0) { //meaning this course is free
             $is_free = 1;
@@ -155,11 +196,11 @@ class ItemController extends AppBaseController
         }
              $input['is_free'] = $is_free;
 
-        $item = $this->itemRepository->create($input);
+        $item = Item::create($input);
 
         Flash::success('Item created successfully.');
 
-        return redirect(route('courses.contents',['course_id'=> $input['course_id'],'contents' => 'yes' ]));
+        return redirect(route('courses.items',['course_id'=> $input['course_id'], 'item_id' => $item->id]));
            
     }
 
@@ -218,17 +259,15 @@ class ItemController extends AppBaseController
     public function update($id, UpdateItemRequest $request)
     {
         $item = $this->itemRepository->findWithoutFail($id);
-
+        
         if (empty($item)) {
             Flash::error('Item not found');
-
             return redirect(route('courses.index'));
         }
 
         $item = $this->itemRepository->update($request->all(), $id);
 
         Flash::success('Item updated successfully.');
-
         return redirect(route('courses.items',['course_id'=> $item->course_id, 'item_id'=> $item->id]));
          
     }

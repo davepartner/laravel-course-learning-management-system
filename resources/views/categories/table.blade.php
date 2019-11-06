@@ -19,15 +19,15 @@
             <td>
                 <h3 style="margin-bottom: 0px;">
        <a href="{!! route('categories.show', [$category->id]) !!}" >
-            {!! $category->name !!}  
+            {!! $category->name !!}  ({!! $category->courses_count !!})
        </a> 
                </h3>
                           
                
-<div>          <small class="text-muted">Courses: {!! $category->courses_count !!} |  
+<div>          <small class="text-muted"> 
     Views: {!! number_format($category->view_count) !!}</small>
        </div>
-<div> {{ str_limit($category->description, $limit = 150, $end = '...') }} </div>
+<div>  {!! str_limit($category->description, $limit = 150, $end = '...') !!} </div>
 
             </td>
         

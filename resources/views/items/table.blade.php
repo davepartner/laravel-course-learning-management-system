@@ -1,7 +1,7 @@
 
    @if(Auth::check() AND (Auth::user()->id == $course->user_id || 
         Auth::user()->role_id < 3))
-            <div class="text-right col-md-12"> 
+            <div class="pull-left col-md-8"> 
                     <a class="btn btn-lg btn-primary" 
                     href="{{ route('items.create', ['course_id'=> $course->id ]) }}"> 
                         <i class="glyphicon glyphicon-plus"> </i>
@@ -34,7 +34,7 @@
             <!-- Url Field -->
         <div class="form-group col-md-12 text-left">
             {!! Form::label('youtube_playlist_url', 'Youtube Playlist Url:') !!}
-            {!! Form::text('youtube_playlist_url', null, ['class' => 'form-control', 'placeholder'=> 'eg. https://youtube.com...']) !!}
+            {!! Form::text('youtube_playlist_url', $course->playlist_url, ['class' => 'form-control', 'placeholder'=> 'eg. https://youtube.com...']) !!}
         </div>
       </div>
       <div class="modal-footer">
@@ -105,30 +105,55 @@
         </tr>
     </thead>
     <tbody>
+      <style>
+          /* A link that has been visited */
+         .greywhenvisited a:visited {
+              color: grey;
+          }
+
+      </style>
          
     @foreach($course->items as $item)
         <tr>
             {{-- {!! $item->url !!} --}}
-            <td data-toggle="modal" data-target="#modal-default">
+            <td data-toggle="modal" data-target="#modal-default" class="greywhenvisited">
                 
-                  @if(isset($item->thumbnail))
-                    <img class="col-md-3" src="{{ $item->thumbnail }}"  style="margin-top: 30px; padding-right: 0px; padding-left: 0px;">
-                  @endif
+                  {{-- @if(isset($item->thumbnail))
+                 <a href="{{ route('courses.items', ['course_id'=> $course->id, 'item_id'=>$item->id ] ) }}"> 
+               
+                  <img class="col-md-3" src="{{ $item->thumbnail }}"  style="margin-top: 30px; padding-right: 0px; padding-left: 0px;">
+                 </a>
+                  @endif --}}
+                 
+                        
+                
                 <div class="col-md-9" style="padding-left: 5px;padding-right: 5px;">
-                        <h3 data-toggle="modal" data-target="#modal-default" > 
-                              @if(!isset($getSubscription->created_at) AND (Auth::user()->id != $course->user_id || Auth::user()->role_id > 2 || $item->is_free != 1) )
-                                    <a href="#" style="color:brown" data-toggle="modal" data-target="#paymentOptions"> 
+                        <div data-toggle="modal" data-target="#modal-default" > 
+                       <i style="margin-right:10px; font-size: 18px; " class="pull-left glyphicon glyphicon-play-circle"></i> 
+                          
+                       <b>
+                       @if(isset($getSubscription->created_at) || Auth::user()->id == $course->user_id || Auth::user()->role_id < 3 || $item->is_free == 1) 
+                                    
+<a href="{{ route('courses.items', ['course_id'=> $course->id, 'item_id'=>$item->id ] ) }}"> 
                             {{ $item->title }} </a> 
-
+                            <small>
+                                @if($item->is_free == 0 && Auth::user()->role_id < 3)
+                                    [not free]
+                                @endif 
+                            </small>
                             @else
-                            <a href="{{ route('courses.items', ['course_id'=> $course->id, 'item_id'=>$item->id ] ) }}"> 
+                            <a href="#" style="color:brown" data-toggle="modal" data-target="#paymentOptions"> 
                             {{ $item->title }} </a> 
                               @endif
 
-                        </h3>
-                        <div class="text-muted">{!! $item->view_count !!} views </div>
+                            </b>
+                            </div>
+                        @if(Auth::user()->role_id < 3)
+                          <div class="text-muted">{!! $item->view_count !!} views </div>
+                        @endif
 
-                        {!! mb_strimwidth($item->description, 0, 150, '...') !!}
+                        {!! $item->description !!}
+                        {{-- {!! mb_strimwidth($item->description, 0, 150, '...') !!} --}}
                   </div>
             </td>
             <td>

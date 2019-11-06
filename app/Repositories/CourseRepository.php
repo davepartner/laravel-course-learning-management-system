@@ -25,6 +25,7 @@ class CourseRepository extends BaseRepository
         'title',
         'sub_title',
         'description',
+        'faq',
         'about_instructor',
         'playlist_url',
         'tags',
@@ -38,7 +39,9 @@ class CourseRepository extends BaseRepository
         'discount_price',
         'actual_price',
         'view_count',
-        'subscriber_count'
+        'subscriber_count',
+        'main_course_id',
+        'summary_course_id',
     ];
 
     /**

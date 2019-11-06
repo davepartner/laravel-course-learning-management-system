@@ -23,10 +23,12 @@ class PaymentRepository extends BaseRepository
         'user_id',
         'category_id',
         'course_id',
-        'amount',
+        'amount', 'proof_of_payment', 'name_of_depositor',
         'status',
         'mode_of_payment',
-        'payment_processor'
+        'payment_processor',
+        'refund_payment_details',
+        'refund_details'
     ];
 
     /**

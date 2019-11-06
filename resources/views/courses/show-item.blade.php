@@ -1,11 +1,11 @@
-<div class="col-md-12">
+<div class="col-md-8">
 
-    <div class="col-md-8">
+    <div class="col-md-12">
         @if(Auth::check() AND (Auth::user()->id == $item->user_id || Auth::user()->role_id < 3))
                <h2 class="text-right">
                   
-                <a href="{{ route('items.edit', ['course_id'=>$item->course_id, 'item_id'=> $item->id ]) }}" class="btn btn-lg btn-primary">
-                     <i class="glyphicon glyphicon-new-window"></i>  Edit</a></h2>
+                <a href="{{ route('items.edit', ['item_id'=> $item->id ]) }}" class="btn btn-xs btn-primary">
+                     <i class="glyphicon glyphicon-new-window"></i>  Edit item</a></h2>
         @endif
                <h2> {{ $item->title }} 
             <br>
@@ -23,16 +23,15 @@
 
        ?>
 
-   @if(!isset($getSubscription->created_at) AND ( Auth::user()->id != $item->user_id || Auth::user()->role_id > 2))
-           <h3 class="col-md-12 text-center"> Pay to access this course </h3>        
-         @include('courses.payment-options')
-   @else
+
+
+  @if(!isset($paymentShowing))
 
         @if($ret > 0)
                 <iframe 
                 width="100%" 
                 height="450px" 
-                src="https://www.youtube.com/embed/<?php echo  $matches[0]; ?>" 
+                src="https://www.youtube.com/embed/<?php echo  $matches[0]; ?>?&autoplay=1" 
                 frameborder="0" 
                 allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
                 allowfullscreen></iframe>
@@ -43,6 +42,23 @@
 
         @endif
 
+        @if(isset($prevItem) && $prevItem > 0)
+        <a href="/courses/items/{{$course->id}}/{{$prevItem}}" 
+            class="pull-left btn btn-xs btn-default">
+        << watch previous video
+        </a>
+        @endif 
+
+         @if(isset($nextItem) && $nextItem > 0)
+        <a href="/courses/items/{{$course->id}}/{{$nextItem}}"
+             class="pull-right btn btn-xs btn-success">
+        watch next video >>
+        </a>
+        @else 
+        Congratulations, you have come to the end of this course. 
+        Please do check back occassionally, the creator of this course might add more content in future.
+        @endif 
+
    @endif
 
 
@@ -51,20 +67,23 @@
 
 <?php } ?> 
 
-   @if(isset($getSubscription->created_at) || Auth::user()->id == $item->user_id || Auth::user()->role_id < 3)
-                   
-         <div class="mt-5 mb-5">
-             <h3>Description 
-             </h3>
-             <div class="text-muted"> {{ $item->created_at->format('h:i a- D d M Y')}} </div>
-                {{ $item->description }}
-         </div>
- @endif
-           <h2 class="col-md-12">Comments and Reviews</h2>
-                        @include('comments.table')
+         
     </div>
 
-    <div class="col-md-4">
+   
+</div>
+
+
+
+
+            
+
+
+
+
+
+
+ <div class="col-md-4 pull-right">
         {{-- list of other videos --}}
         <h3> Playlist </h3> 
         
@@ -82,5 +101,7 @@
                     @endforeach
          </div>
     </div>
-
-</div>
+    <div class="col-md-8 pull-left">
+  <h2>Comments and Reviews</h2>
+                        @include('comments.table')
+    </div>

@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('layouts.app',['title'=>'Edit course:'.$course->title])
 
 @section('content')
     <section class="content-header">

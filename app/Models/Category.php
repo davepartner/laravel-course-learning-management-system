@@ -58,6 +58,10 @@ class Category extends Model
     {
         return $this->hasMany('App\Models\Course');
     }
-   
+
+    public function payments()
+    {
+        return $this->hasMany('App\Models\Payment');
+    }
     
 }

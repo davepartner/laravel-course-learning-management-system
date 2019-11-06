@@ -13,27 +13,34 @@
             <td>{!! $course->photo !!}</td>
             <td width="80%">
                 <h4  style="margin-bottom: 0px;">
-                 <a href="{!! route('courses.show', [$course->id]) !!}" >
+            <i class="glyphicon glyphicon-education text-muted"></i>  Click here <i class="glyphicon glyphicon-hand-right"></i>     
+              &nbsp; <a href="{!! route('courses.show', [$course->id]) !!}" >
                      {!! $course->title !!}
                     </a>
                 </h4> 
            <div class="text-muted"> 
-               Author: {{ $course->user['name'] }} 
+               <i class="glyphicon glyphicon-user"></i> 
+               &nbsp;  &nbsp; &nbsp;{{ $course->user['name'] }} 
+              &nbsp;  &nbsp; &nbsp; <i class="glyphicon glyphicon-eye-open"></i> 
+               &nbsp; Views: {{ $course->view_count }} 
 
             @if($course->subscriber_count > 0)
-            | Students : {{ number_format($course->subscriber_count) }}
-            @endif
-            @if($course->view_count > 0)
-            | Views : {{ number_format($course->view_count) }}
+            <i class="glyphicon glyphicon-education"> Students : {{ number_format($course->subscriber_count) }}
             @endif
 
            </div>
             
-            {!! $course->sub_title !!}
+            <i class="glyphicon glyphicon-align-right text-muted"></i>  &nbsp; &nbsp; &nbsp; {!! $course->sub_title !!}
             </td>
             <td>
-                <h3 style="margin-bottom: 0px;">${!! $course->discount_price !!}</h3>
-                <del style="text-decoration: line-through; padding-left:10px;">${!! $course->actual_price !!}</del>
+                <h3 style="margin-bottom: 0px;">${{ number_format($course->discount_price/360) }}
+                    <small>
+                         (₦{!! number_format($course->discount_price) !!})
+                    </small>
+                  
+                    
+                </h3>
+               
             
             </td>
 

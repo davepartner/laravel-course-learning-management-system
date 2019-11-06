@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('layouts.app',['title'=>'Creating payment'])
 
 @section('content')
     <section class="content-header">

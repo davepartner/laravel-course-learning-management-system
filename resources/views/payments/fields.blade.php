@@ -1,21 +1,7 @@
-<!-- User Id Field -->
-<div class="form-group col-sm-6">
-    {!! Form::label('user_id', 'User Id:') !!}
-    {!! Form::number('user_id', null, ['class' => 'form-control']) !!}
-</div>
-
-<!-- Category Id Field -->
-<div class="form-group col-sm-6">
-    {!! Form::label('category_id', 'Category Id:') !!}
-    {!! Form::number('category_id', null, ['class' => 'form-control']) !!}
-</div>
-
-<!-- Course Id Field -->
-<div class="form-group col-sm-6">
-    {!! Form::label('course_id', 'Course Id:') !!}
-    {!! Form::number('course_id', null, ['class' => 'form-control']) !!}
-</div>
-
+@if(isset($payment))
+<h3> <a href="/payments/{{ $payment->course['id']}}">
+     {{ $payment->course['title']}} </a> </h3>
+     @endif
 <!-- Amount Field -->
 <div class="form-group col-sm-6">
     {!! Form::label('amount', 'Amount:') !!}
@@ -23,16 +9,30 @@
 </div>
 
 <!-- Status Field -->
+
 <div class="form-group col-sm-6">
-    {!! Form::label('status', 'Status:') !!}
-    {!! Form::text('status', null, ['class' => 'form-control']) !!}
+  <label for="sel1">Status:</label>
+  <select class="form-control" name="status" id="sel1">
+    <option value="{{$payment->status}}">{{$payment->status}}</option>
+    <option value="pending confirmation">pending confirmation</option>
+    <option value="confirmed">confirmed</option>
+    <option value="refunded">refunded</option>
+  </select>
 </div>
 
-<!-- Mode Of Payment Field -->
+<!-- User Id Field -->
+
+
 <div class="form-group col-sm-6">
-    {!! Form::label('mode_of_payment', 'Mode Of Payment:') !!}
-    {!! Form::text('mode_of_payment', null, ['class' => 'form-control']) !!}
+  <label for="sel1">course:</label>
+  <select class="form-control" name="course_id" id="course_id">
+    <option value="{{$payment->course['id']}}">{{$payment->course['title']}}</option>
+    @foreach($courses as $course)
+    <option value="{{$course['id']}}">{{$course['title']}}</option>
+    @endforeach
+  </select>
 </div>
+
 
 <!-- Payment Processor Field -->
 <div class="form-group col-sm-6">

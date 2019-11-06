@@ -1,23 +1,43 @@
-<li class="{{ Request::is('categories*') ? 'active' : '' }}">
-    <a href="{!! route('categories.index') !!}"><i class="fa fa-edit"></i><span>
-        Course Categories</span></a>
-</li>
 
-
-
-
-<li class="{{ Request::is('courseUsers*') ? 'active' : '' }}">
-    <a href="{!! route('courseUsers.index') !!}"><i class="fa fa-edit"></i><span>Subscriptions</span></a>
-</li>
-
-    
 <li class="{{ Request::is('courses*') ? 'active' : '' }}">
     <a href="{!! route('courses.index') !!}"><i class="fa fa-edit"></i><span>Courses</span></a>
 </li>
 
+<li class="{{ Request::is('categories*') ? 'active' : '' }}">
+    <a href="{!! route('categories.index') !!}">
+            <i class="glyphicon glyphicon-list"></i><span>
+        Course Categories</span></a>
+</li>
+
+ 
+<li class="{{ Request::is('payments*') ? 'active' : '' }}">
+    <a href="{!! route('payments.index') !!}">
+        <i class="fa">₦</i><span>My Payments</span></a>
+</li>
+<br/>
+<br/>
+<br/>
+<li class="">
+ <a href="{!! url('/logout') !!}"
+        onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+        <i class="glyphicon glyphicon-off"></i><span> Logout out
+</a>
+<form id="logout-form" action="{{ url('/logout') }}" method="POST" style="display: none;">
+        {{ csrf_field() }}
+</form>
+</li>
+
+<br>                     <br>
+
+@if (Auth::user()->role_id < 3)
 <li >
     <a href="#"><i class="fa fa-user"></i><span>ADMIN MENU</span></a>
 </li>
+   
+<li class="{{ Request::is('courseUsers*') ? 'active' : '' }}">
+    <a href="{!! route('courseUsers.index') !!}"><i class="glyphicon glyphicon-thumbs-up"></i><span>My Subscriptions</span></a>
+</li>
+
 {{-- Moderator 
 @if (Auth::user()->role_id < 4)
 <li class="{{ Request::is('courses*') ? 'active' : '' }}">
@@ -26,8 +46,6 @@
 @endif--}}
 
 {{-- Admin section --}}
-
-@if (Auth::user()->role_id < 3)
     
 <li class="{{ Request::is('courses*') ? 'active' : '' }}">
     <a href="{!! route('courses.index') !!}"><i class="fa fa-edit"></i><span>Admin Courses</span></a>

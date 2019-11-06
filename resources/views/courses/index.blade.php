@@ -1,8 +1,8 @@
-@extends('layouts.app')
+@extends('layouts.app',['title'=>'All courses'])
 
 @section('content')
     <section class="content-header">
-        <h1 class="pull-left">Courses</h1>
+        <h1 class="pull-left">Click on any course below to see more details about the course</h1>
         @if(Auth::check() && Auth::user()->role_id < 4)
         <h1 class="pull-right">
            <a class="btn btn-primary pull-right" 

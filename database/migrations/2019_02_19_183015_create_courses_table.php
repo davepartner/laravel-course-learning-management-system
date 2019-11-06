@@ -19,9 +19,12 @@ class CreateCoursesTable extends Migration
 
             //create course
             $table->integer('category_id');
+            
             $table->string('title');
             $table->string('sub_title')->nullable(); 
             $table->longText('description');
+            $table->longText('faq')->nullable();
+            $table->longText('refund_policy')->nullable();
             $table->longText('about_instructor')->nullable();
             $table->string('playlist_url');
             $table->string('tags')->nullable(); //php, laravel, html
@@ -41,6 +44,8 @@ class CreateCoursesTable extends Migration
             $table->double('actual_price', 10, 2);
 
             //stats
+            $table->integer('main_course_id')->nullable(); //empty
+            $table->integer('summary_course_id')->nullable(); //empty
             $table->integer('view_count')->default(0)->nullable();
             $table->integer('subscriber_count')->default(0)->nullable();
          

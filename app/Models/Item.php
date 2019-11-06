@@ -33,11 +33,11 @@ class Item extends Model
         'user_id',
         'course_id',
         'view_count',
+        'description',
         'url',
         'title',
         'is_free',
         'thumbnail',
-        'description'
     ];
 
     /**
@@ -54,7 +54,7 @@ class Item extends Model
         'thumbnail' => 'string',
         'url' => 'string',
         'title' => 'string',
-        'description' => 'string'
+        'description' => 'string',
     ];
 
     /**
@@ -74,5 +74,10 @@ class Item extends Model
     public function comments()
     {
         return $this->hasMany('App\Models\Comment');
+    }
+
+    public function views()
+    {
+        return $this->hasMany('App\Models\View');
     }
 }

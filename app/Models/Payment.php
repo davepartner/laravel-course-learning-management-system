@@ -35,10 +35,12 @@ class Payment extends Model
         'user_id',
         'category_id',
         'course_id',
-        'amount',
+        'amount', 'proof_of_payment','name_of_depositor',
         'status',
         'mode_of_payment',
-        'payment_processor'
+        'payment_processor',
+        'refund_payment_details',
+        'refund_details'
     ];
 
     /**
@@ -52,9 +54,13 @@ class Payment extends Model
         'category_id' => 'integer',
         'course_id' => 'integer',
         'amount' => 'float',
+        'proof_of_payment'=>'string', 
+        'name_of_depositor' => 'string',
         'status' => 'string',
         'mode_of_payment' => 'string',
-        'payment_processor' => 'string'
+        'payment_processor' => 'string',
+        'refund_payment_details' => 'string',
+        'refund_details' => 'string'
     ];
 
     /**
@@ -65,6 +71,21 @@ class Payment extends Model
     public static $rules = [
         
     ];
+
+
+    public function user()
+    {
+        return $this->belongsTo('App\Models\User');
+    }
+
+    public function course()
+    {
+        return $this->belongsTo('App\Models\Course');
+    }
+    public function category()
+    {
+        return $this->belongsTo('App\Models\Category');
+    }
 
     
 }

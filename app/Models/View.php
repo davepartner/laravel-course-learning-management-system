@@ -60,5 +60,9 @@ class View extends Model
         
     ];
 
-    
+    public function item()
+    {
+        return $this->belongsTo('App\Models\Item');
+    }
+
 }

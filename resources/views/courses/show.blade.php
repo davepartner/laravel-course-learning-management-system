@@ -1,9 +1,16 @@
-@extends('layouts.app')
+@extends('layouts.app', ['title'=> $course->title])
 
 @section('content')
     <section class="content-header">
-       
+
+        @if(Auth::check() && Auth::user()->id == $course->user_id)
+        <a href="{!! route('courses.edit', [$course->id]) !!}" 
+            class='btn btn-primary btn-lg pull-right'>
+            <i class="glyphicon glyphicon-edit"></i> Edit course</a>
+        @endif
     </section>
+
+
     <div class="content">
 
         <div class="clearfix"></div>
@@ -16,10 +23,15 @@
             <div class="box-body">
  
                     @include('courses.header')
+                    {{-- Show menu only if person has paid or is owner or is admin --}}
+            @if(isset($getSubscription->created_at) || (Auth::check() && (Auth::user()->id == $course->user_id || Auth::user()->role_id < 3)  ) )
+               
+            @include('courses.menu')
+                 
+                    @endif
 
-                    @include('courses.menu')
-
-                <div class="row" style="padding-left: 20px">
+                <div class="row" style="padding-left: 20px; 
+                font-size: 15px !important;">
 
                     @if(isset($items) AND $items == 'yes')
                          @include('courses.show-item')
@@ -36,18 +48,8 @@
 
 
                    
-                    
-
-
-
-
-
-
-                   
-
-                    
                 </div>
             </div>
         </div>
-    </div>
+  
 @endsection

@@ -9,6 +9,7 @@ use App\Http\Controllers\AppBaseController;
 use Illuminate\Http\Request;
 use Flash;
 use Auth;
+use Hash;
 use Prettus\Repository\Criteria\RequestCriteria;
 use Response;
 use Illuminate\Support\Facades\DB;
@@ -62,7 +63,7 @@ class UserController extends AppBaseController
         $input = $request->all();
         $input['user_id'] = Auth::user()->id;
 
-        $user = $this->userRepository->create($input);
+       // $user = $this->userRepository->create($input);
 
         Flash::success('User saved successfully.');
 
@@ -131,8 +132,14 @@ class UserController extends AppBaseController
 
             return redirect(route('users.index'));
         }
+        $input = $request->all();
 
-        $user = $this->userRepository->update($request->all(), $id);
+        if(!empty( $input['password'])){
+          $input['password'] = Hash::make($input['password']);   
+        }
+       
+
+        $user = $this->userRepository->update($input, $id);
 
         Flash::success('User updated successfully.');
 

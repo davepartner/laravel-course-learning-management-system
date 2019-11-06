@@ -11,46 +11,54 @@
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
-});
+Route::get('/', 'HomeController@welcome');
 
 Auth::routes();
 
-Route::get('/home', 'CategoryController@index')->name('home');
+Route::get('/home', 'CourseController@index')->name('home');
 
-
-Route::resource('categories', 'CategoryController');
-
-Route::resource('comments', 'CommentController');
-
-//courses
-Route::resource('courses', 'CourseController');
-
-//publish/unpublish
-Route::post('courses/publishCourse', 'CourseController@publishCourse' )->name('courses.publishCourse');
-Route::post('courses/unpublishCourse', 'CourseController@unpublishCourse' )->name('courses.unpublishCourse');
-
+Route::get('/privacy', function () {
+    return view('privacy_policy');
+});
+Route::get('/tos', function(){
+    return view('terms_of_service');
+});
+Route::get('/refund', function () {
+    return view('refunds');
+});
 
 
 
-Route::get('courses/contents/{course_id}', 'CourseController@contents')->name('courses.contents');
-Route::get('courses/comments/{course_id}', 'CourseController@comments')->name('courses.comments');
 
 
 Route::post('/pay', 'PaymentController@redirectToGateway')->name('pay');
 Route::get('/payment/callback', 'PaymentController@handleGatewayCallback')->name('paymentCallback');
 
+    Route::resource('payments', 'PaymentController');
+
+
 //logged in
 Route::middleware(['auth'])->group(function () {
+    
+    //publish/unpublish
+Route::post('courses/publishCourse', 'CourseController@publishCourse' )->name('courses.publishCourse');
+Route::post('courses/unpublishCourse', 'CourseController@unpublishCourse' )->name('courses.unpublishCourse');
+
+Route::get('courses/contents/{course_id}', 'CourseController@contents')->name('courses.contents');
+Route::get('courses/comments/{course_id}', 'CourseController@comments')->name('courses.comments');
+
+    Route::resource('comments', 'CommentController');
+    Route::resource('categories', 'CategoryController');
+
     Route::get('comments/create', 'CommentController@create')->name('comment.create');
     Route::resource('coupons', 'CouponController');
     Route::get('courses/items/{course_id}/{item_id}', 'CourseController@items')->name('courses.items');
-    Route::resource('users', 'UserController');
-    Route::resource('payments', 'PaymentController');
+    
     Route::resource('courseUsers', 'CourseUserController');
-
+Route::resource('users', 'UserController');
 });
+
+
 
 //instructor
 Route::middleware(['instructor'])->group(function () {
@@ -74,18 +82,17 @@ Route::middleware(['moderator'])->group(function () {
     Route::resource('roles', 'RoleController');
 
     //users
-    Route::get('users/index', 'UserController@index')->name('users.index');
     Route::get('users/create', 'UserController@create')->name('users.create');
 
     //comments
     Route::get('comments/index', 'CommentController@index')->name('comments.index');
 
     //payments
-    Route::get('payments/index', 'PaymentController@index')->name('payments.index');
+    Route::get('payments/{id}/delete', 'PaymentController@destroy')->name('payments.delete');
 
     //courseUser or Subscripions
     Route::get('courseUsers/create', 'CourseUserController@create')->name('courseUsers.create');
-    Route::get('courseUsers/{id}/edit', 'CourseUserController@edit')->name('courseUsers.edit');
+   Route::get('courseUsers/{id}/edit', 'CourseUserController@edit')->name('courseUsers.edit');
 
 
     //items
@@ -96,3 +103,7 @@ Route::middleware(['moderator'])->group(function () {
     Route::get('categories/{id}/edit', 'CategoryController@edit')->name('categories.edit');
     Route::delete('categories/{id}/delete', 'CategoryController@delete')->name('categories.delete');
 });
+
+Route::get('courses/{id}', 'CourseController@show')->name('courses.show');
+
+Route::resource('courses', 'CourseController');
