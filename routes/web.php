@@ -27,8 +27,12 @@ Route::get('/refund', function () {
     return view('refunds');
 });
 
-
-
+//facebook login
+Route::get('login/facebook', 'Auth\LoginController@redirectToProvider')->name('login.facebook');
+Route::get('login/facebook/callback', 'Auth\LoginController@handleProviderCallback');
+//google
+Route::get('login/google', 'Auth\GoogleController@redirectToProvider');
+Route::get('login/google/callback', 'Auth\GoogleController@handleProviderCallback');
 
 
 Route::post('/pay', 'PaymentController@redirectToGateway')->name('pay');

@@ -38,6 +38,14 @@ return [
             'secret' => env('STRIPE_WEBHOOK_SECRET'),
             'tolerance' => env('STRIPE_WEBHOOK_TOLERANCE', 300),
         ],
+    ],'facebook' => [
+        'client_id' => '3174755132597763',         // Your Facebook Client ID
+        'client_secret' => 'a594a068b8ffa648def0ee7c2ad6312c', // Your Facebook Client Secret
+        'redirect' => 'https://35.231.223.153/login/facebook/callback',
+    ],'google' => [
+        'client_id' => '883841150466-sfp0diqg7qvc05jhi0ecl65v3u80vk9i.apps.googleusercontent.com',         // Your google Client ID
+        'client_secret' => 'DvfY-pk_UDGxvCjCHPF564Zb', // Your google Client Secret
+        'redirect' => 'http://35.231.223.153/login/google/callback',
     ],
 
 ];

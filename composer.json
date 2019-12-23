@@ -18,6 +18,7 @@
         "infyomlabs/laravel-generator": "5.7.x-dev",
         "infyomlabs/swagger-generator": "dev-master",
         "laravel/framework": "5.7.*",
+        "laravel/socialite": "^4.2",
         "laravel/tinker": "^1.0",
         "laravelcollective/html": "^5.7.0",
         "unicodeveloper/laravel-paystack": "^1.0"

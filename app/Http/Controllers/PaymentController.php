@@ -170,11 +170,12 @@ class PaymentController extends AppBaseController
         //     ->bcc($evenMoreUsers)
         //     ->send(new OrderShipped($order));
 
+        //GET THE USER ID USING EITHER OF 3 WAYS
 //check if user is currently logged in while reporting bank account
         if (Auth::check() AND Auth::user()->role_id > 2) {
             
                 $user_id = Auth::user()->id;
-            $input['user_id'] = Auth::user()->id;
+                $input['user_id'] = Auth::user()->id;
             
          
         } else {
@@ -202,29 +203,38 @@ class PaymentController extends AppBaseController
 
 
         }
+//now we've got the user id, lets check if the payment has been submitted before
 
         $payment = Payment::where('user_id', $input['user_id'])
         ->where('course_id', $input['course_id'])->first();
-        if(!$payment){
+
+        if(!exists($payment)){
                 $payment = $this->paymentRepository->create($input);
-                //send email to user 
+                //send email to user  
+                Mail::to($input['email'])
+                ->send(new PaymentSubmitted( $payment)); 
+                
+                //send email to admin
+             Mail::to('realdavepartner@gmail.com')
+            ->send(new PaymentSubmittedAdmin($payment)); 
+            
+            Flash::success('Payment submitted successfully. You will get an email once we receive the payment confirmation. Admin will activate your course once your payment is verified within 24 hours');
+            if(!Auth::check()){
+                    Auth::loginUsingId($user_id);
+                }
+                
+                return redirect()->route('payments.index');
+             }else{
+            //log this person in with a message
+            Flash::success('You already subscribed to this course, you just need to login');
+            
+            return redirect()->route('login');
              }
 
-        Mail::to($input['email'])
-            ->send(new PaymentSubmitted( $payment));
-
-        //send email to admin
-        Mail::to('realdavepartner@gmail.com')
-            ->send(new PaymentSubmittedAdmin($payment));
-  
-
-        Flash::success('Payment submitted successfully. You will get an email once we receive the payment confirmation. Admin will activate your course once your payment is verified within 24 hours');
-        if(!Auth::check()){
-            Auth::loginUsingId($user_id);
-        }
+      
 
         
-        return redirect()->route('payments.index');
+        
     }
 
     /**
